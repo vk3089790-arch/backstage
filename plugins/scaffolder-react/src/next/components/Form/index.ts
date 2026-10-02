@@ -15,5 +15,8 @@
  */
 
 export { Form } from './Form';
-export { useScaffolderTheme } from './ScaffolderThemeContext';
+export {
+  useScaffolderTheme,
+  ScaffolderThemeProvider,
+} from './ScaffolderThemeContext';
 export type { ScaffolderTheme } from './ScaffolderThemeContext';

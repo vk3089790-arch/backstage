@@ -248,6 +248,13 @@ export const EntityPicker = (props: EntityPickerProps) => {
 
   const handleBlur = useCallback(() => {
     if (allowArbitraryValues && inputValue) {
+      const currentSelectedOption = buiOptions.find(
+        o => o.value === lastCommittedRef.current,
+      );
+      if (currentSelectedOption && inputValue === currentSelectedOption.label) {
+        return;
+      }
+
       let entityRef = inputValue;
       try {
         entityRef = stringifyEntityRef(
@@ -264,6 +271,7 @@ export const EntityPicker = (props: EntityPickerProps) => {
   }, [
     allowArbitraryValues,
     inputValue,
+    buiOptions,
     defaultKind,
     defaultNamespace,
     onChange,

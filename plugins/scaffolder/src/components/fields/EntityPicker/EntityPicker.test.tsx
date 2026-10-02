@@ -15,6 +15,7 @@
  */
 
 import { CATALOG_FILTER_EXISTS } from '@backstage/catalog-client';
+import { ScaffolderThemeProvider } from '@backstage/plugin-scaffolder-react/alpha';
 import { Entity } from '@backstage/catalog-model';
 import {
   catalogApiRef,
@@ -584,6 +585,47 @@ describe('<EntityPicker />', () => {
       expect(getByText('squad b')).toBeInTheDocument();
 
       fireEvent.blur(input);
+    });
+
+    it('does not overwrite a selected entity ref with its display title on blur', async () => {
+      const entityRef = 'group:default/team-a';
+      const items = entities.map(item => ({
+        ...item,
+        metadata: {
+          ...item.metadata,
+          title: item.metadata.name.replace('-', ' ').toUpperCase(),
+        },
+      }));
+
+      catalogApi.streamEntities.mockImplementation(async function* () {
+        yield items;
+      });
+
+      props = {
+        ...props,
+        formData: entityRef,
+        uiSchema: {
+          'ui:options': {
+            defaultKind: 'Group',
+            allowArbitraryValues: true,
+          },
+        },
+      } as unknown as FieldProps<any>;
+
+      await renderInTestApp(
+        <Wrapper>
+          <ScaffolderThemeProvider value="bui">
+            <EntityPicker {...props} />
+          </ScaffolderThemeProvider>
+        </Wrapper>,
+      );
+
+      const input = await screen.findByRole('combobox');
+      expect(input).toHaveValue('TEAM A');
+
+      fireEvent.blur(input);
+
+      expect(onChange).not.toHaveBeenCalled();
     });
 
     it('renders selection title', async () => {
